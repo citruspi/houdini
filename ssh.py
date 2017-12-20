@@ -36,7 +36,7 @@ def exec(payload):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(address, username=username, pkey=private_key)
 
-    stdin, stdout, stderr = ssh.exec_command('uptime')
+    stdin, stdout, stderr = ssh.exec_command(command)
 
     try:
         resp['stdin'] = stdin.read().decode('utf-8')
