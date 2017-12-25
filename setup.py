@@ -14,5 +14,6 @@ setup(
     platforms='any',
     install_requires=[
         'paramiko',
+        'winrm'
     ]
 )
