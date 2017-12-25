@@ -2,6 +2,7 @@
 # coding: utf-8 -*-
 
 import ssh
+import winrmr
 
 
 def lambda_handler(event, context):
@@ -11,3 +12,5 @@ def lambda_handler(event, context):
         return
     elif mode == 'ssh':
         return ssh.exec(event)
+    elif mode == 'winrm':
+        return winrmr.exec(event)
