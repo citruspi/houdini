@@ -1,18 +1,31 @@
-![](https://user-images.githubusercontent.com/2125849/34199788-cf25ae90-e566-11e7-87c6-ae2f14b47d7e.png)
+![](https://user-images.githubusercontent.com/2125849/34342959-c8822054-e9b8-11e7-844d-8accd6e9d9da.png)
 
-<br/><br/>
+<br/>
+
+### Table of Contents
+
+- [Overview](#overview)
+- [SSH](#ssh) (Linux/Unix hosts)
+- [Setup](#setup)
+- [Usage](#usage)
+
+<br>
 
 ## Overview
 
-Houdini runs on [AWS Lambda][0] and executes commands on remote hosts over SSH using [Paramiko][1].
-The host address, username, command, and private key name are provided by the consumer in the Lambda `event`, the command is executed, and the contents of `stdin`, `stdout`, and `stderr` are returned.
-The actual content of the private key used for establishing the SSH connection is encrypted with an [AWS KMS][2] key and stored in [AWS SSM Parameter Store][3].
+Houdini runs on [AWS Lambda][0] and executes commands on remote hosts
+- over SSH using [Paramiko][1]
+- over WinRM using [pywinrm][6]
 
 ### Sample Use Cases
 
-- Executing commands on SSH hosts from other Lambda functions
-- Executing commands on SSH hosts from other hosts in other VPCs/network configurations (e.g. deploy a copy of the Lambda to each network environment)
-- Cron-as-a-Service; schedule commands to run on SSH hosts using [scheduled events][4]
+- Executing commands on hosts from other Lambda functions
+- Executing commands on hosts from other hosts in other VPCs/network configurations (e.g. deploy a copy of the Lambda to each network environment)
+- Cron-as-a-Service; schedule commands to run on hosts using [scheduled events][4]
+
+<br>
+
+## SSH
 
 ### Security Considerations
 
@@ -103,49 +116,6 @@ $ python
 >>> print(resp_payload['stdout'])
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 root         1  0.0  0.5  19648  2548 ?        Ss   05:08   0:00 /sbin/init
-root         2  0.0  0.0      0     0 ?        S    05:08   0:00 [kthreadd]
-root         3  0.0  0.0      0     0 ?        S    05:08   0:00 [ksoftirqd/0]
-root         4  0.0  0.0      0     0 ?        S    05:08   0:00 [kworker/0:0]
-root         5  0.0  0.0      0     0 ?        S<   05:08   0:00 [kworker/0:0H]
-root         7  0.0  0.0      0     0 ?        S    05:08   0:00 [rcu_sched]
-root         8  0.0  0.0      0     0 ?        S    05:08   0:00 [rcu_bh]
-root         9  0.0  0.0      0     0 ?        S    05:08   0:00 [migration/0]
-root        10  0.0  0.0      0     0 ?        S<   05:08   0:00 [lru-add-drain]
-root        11  0.0  0.0      0     0 ?        S    05:08   0:00 [cpuhp/0]
-root        12  0.0  0.0      0     0 ?        S    05:08   0:00 [kdevtmpfs]
-root        13  0.0  0.0      0     0 ?        S<   05:08   0:00 [netns]
-root        14  0.0  0.0      0     0 ?        S    05:08   0:00 [kworker/u30:1]
-root        16  0.0  0.0      0     0 ?        S    05:08   0:00 [xenwatch]
-root        20  0.0  0.0      0     0 ?        S    05:08   0:00 [xenbus]
-root        21  0.0  0.0      0     0 ?        S    05:08   0:00 [kworker/0:1]
-root       143  0.0  0.0      0     0 ?        S    05:08   0:00 [khungtaskd]
-root       144  0.0  0.0      0     0 ?        S    05:08   0:00 [oom_reaper]
-root       145  0.0  0.0      0     0 ?        S<   05:08   0:00 [writeback]
-root       147  0.0  0.0      0     0 ?        S    05:08   0:00 [kcompactd0]
-root       148  0.0  0.0      0     0 ?        SN   05:08   0:00 [ksmd]
-root       149  0.0  0.0      0     0 ?        S<   05:08   0:00 [crypto]
-root       150  0.0  0.0      0     0 ?        S<   05:08   0:00 [kintegrityd]
-root       151  0.0  0.0      0     0 ?        S<   05:08   0:00 [bioset]
-root       153  0.0  0.0      0     0 ?        S<   05:08   0:00 [kblockd]
-root       504  0.0  0.0      0     0 ?        S<   05:08   0:00 [md]
-root       632  0.0  0.0      0     0 ?        S    05:08   0:00 [kswapd0]
-root       633  0.0  0.0      0     0 ?        S<   05:08   0:00 [vmstat]
-root       730  0.0  0.0      0     0 ?        S<   05:08   0:00 [kthrotld]
-root       778  0.0  0.0      0     0 ?        S<   05:08   0:00 [bioset]
-root      1371  0.0  0.0      0     0 ?        S<   05:08   0:00 [ata_sff]
-root      1424  0.0  0.0      0     0 ?        S    05:08   0:00 [scsi_eh_0]
-root      1425  0.0  0.0      0     0 ?        S<   05:08   0:00 [scsi_tmf_0]
-root      1428  0.0  0.0      0     0 ?        S    05:08   0:00 [scsi_eh_1]
-root      1430  0.0  0.0      0     0 ?        S<   05:08   0:00 [scsi_tmf_1]
-root      1497  0.0  0.0      0     0 ?        S    05:08   0:00 [jbd2/xvda1-8]
-root      1498  0.0  0.0      0     0 ?        S<   05:08   0:00 [ext4-rsv-conver]
-root      1539  0.0  0.5  11444  2584 ?        Ss   05:08   0:00 /sbin/udevd -d
-root      1664  0.0  0.4  11324  2100 ?        S    05:08   0:00 /sbin/udevd -d
-root      1826  0.0  0.0      0     0 ?        S<   05:08   0:00 [kworker/0:1H]
-root      1849  0.0  0.0      0     0 ?        S    05:08   0:00 [kauditd]
-root      1865  0.0  0.1 109096   540 ?        Ss   05:08   0:00 lvmetad
-root      1874  0.0  0.0  27152   192 ?        Ss   05:08   0:00 lvmpolld
-root      1926  0.0  0.0      0     0 ?        S<   05:08   0:00 [ipv6_addrconf]
 root      2223  0.0  2.6 362348 13292 ?        Ssl  05:08   0:02 /usr/bin/amazon-ssm-agent
 root      2233  0.0  0.4  52960  2148 ?        S<sl 05:08   0:00 auditd
 root      2262  0.0  0.5 247388  2804 ?        Sl   05:08   0:00 /sbin/rsyslogd -i /var/run/syslogd.pid -c 5
@@ -163,10 +133,6 @@ root      2601  0.0  0.0  19144   168 ?        Ss   05:08   0:00 /usr/sbin/atd
 root      2634  0.0  0.3   6464  1652 ttyS0    Ss+  05:08   0:00 /sbin/agetty ttyS0 9600 vt100-nav
 root      2637  0.0  0.2   4316  1456 tty1     Ss+  05:08   0:00 /sbin/mingetty /dev/tty1
 root      2640  0.0  0.2   4316  1452 tty2     Ss+  05:08   0:00 /sbin/mingetty /dev/tty2
-root      2643  0.0  0.2   4316  1472 tty3     Ss+  05:08   0:00 /sbin/mingetty /dev/tty3
-root      2645  0.0  0.2   4316  1484 tty4     Ss+  05:08   0:00 /sbin/mingetty /dev/tty4
-root      2647  0.0  0.2   4316  1480 tty5     Ss+  05:08   0:00 /sbin/mingetty /dev/tty5
-root      2649  0.0  0.2   4316  1444 tty6     Ss+  05:08   0:00 /sbin/mingetty /dev/tty6
 root      2650  0.0  0.3  10880  1600 ?        S    05:08   0:00 /sbin/udevd -d
 root     23661  0.0  1.4 117872  7120 ?        Ss   08:19   0:00 sshd: ec2-user [priv]
 ec2-user 23663  0.0  0.7 117872  3700 ?        S    08:19   0:00 sshd: ec2-user@pts/0
@@ -195,3 +161,4 @@ ec2-user 24844  0.0  0.4 117216  2380 ?        Rs   10:27   0:00 ps aux
 [3]: https://aws.amazon.com/systems-manager/features/#Parameter_Store
 [4]: http://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html
 [5]: http://docs.paramiko.org/en/2.4/api/client.html?#paramiko.client.AutoAddPolicy
+[6]: https://github.com/diyan/pywinrm
